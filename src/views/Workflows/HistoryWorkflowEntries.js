@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LayoutContext } from '../../containers/DefaultLayout/LayoutContext';
-import { workflowService } from '../../_services';
+import { workflowServices } from './services';
 import { List, Button, Segment, Icon, Label } from 'semantic-ui-react'
 import { history } from '../../_helpers/history';
 
@@ -49,7 +49,7 @@ export function HistoryWorkflowEntriesList() {
     const layout = React.useContext(LayoutContext);
     function loadData(value) {
         layout.showLoading();
-        workflowService.getHistoryWorkflowEntrys({ page: value, pageSize })
+        workflowServices.getHistoryWorkflowEntrys({ page: value, pageSize })
             .then(_ => {
                 setData(_.data);
                 setPage(_.page);
@@ -60,7 +60,7 @@ export function HistoryWorkflowEntriesList() {
     }
     function loadEntryDetail(id) {
         layout.showLoading();
-        workflowService.getHistoryWorkflowEntry(id)
+        workflowServices.getHistoryWorkflowEntry(id)
             .then(_ => {
                 setSelected({ ..._, id });
             })

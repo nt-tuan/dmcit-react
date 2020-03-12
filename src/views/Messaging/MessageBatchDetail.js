@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessagingServiceApi } from '../../_services/messaging';
 import { useAlert } from 'react-alert';
-import { Label } from 'semantic-ui-react';
+import { Label, Segment } from 'semantic-ui-react';
 import MaterialTable from 'material-table';
 export default function MessageBatchDetail(props) {
   const [loading, setLoading] = useState(true);
@@ -27,14 +27,15 @@ export default function MessageBatchDetail(props) {
       });
   }, []);
 
-  return loading ? <p>Loading...</p> : (<div>
-    <h6>SEND TIME</h6>
-    <h4>{data.sentDate}</h4>
-    <h6>FINISH TIME</h6>
-    <h4>{data.finishDate}</h4>
+  return loading ? <p>Loading...</p> : (<Segment>
+    <h4>Send message batch #{data.id}</h4>
+    <hr />
+    <h6>SEND TIME: {data.sentDate}</h6>
+    <h6>FINISH TIME {data.finishDate}</h6>
+    <hr />
+    <h6>MESSAGE LIST</h6>
     {data.createdBy && <div><h6>Người gửi</h6><h4>data.created.name</h4></div>}
     <MaterialTable
-      title="MESSAGE LIST"
       columns={[
         {
           title: 'Id',
@@ -109,5 +110,5 @@ export default function MessageBatchDetail(props) {
         sorting: false
       }}
     />
-  </div>)
+  </Segment>)
 }

@@ -12,8 +12,24 @@ export const userService = {
   getRoles,
   getAllRoles,
   getMyRoles,
-  authenticated
+  authenticated,
+
+  resetPassword,
+  lock,
+  unlock
 };
+
+function resetPassword(username){
+  return defaultFetch(`/api/account/reset/${username}`);
+}
+
+function lock(id){
+  return defaultFetch(`/api/account/lock/${id}`);
+}
+
+function unlock(id){
+  return defaultFetch(`/api/account/unlock/${id}`);
+}
 
 function login(username, password) {
   return defaultFetch('/api/account/login',

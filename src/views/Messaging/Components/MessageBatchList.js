@@ -30,7 +30,7 @@ export default function MessageBatchList(props) {
 
   return (
     <div>
-      <Form>
+      <Form size='tiny'>
         <FormGroup>
           <Form.Field>
             <label>FROM DATE</label>
@@ -50,7 +50,7 @@ export default function MessageBatchList(props) {
           </Form.Field>
           <Form.Field>
             <label>&nbsp;</label>
-            <Form.Button onClick={onFilter} primary>GO</Form.Button>
+            <Form.Button onClick={onFilter} primary size='mini'>GO</Form.Button>
           </Form.Field>
         </FormGroup>
       </Form>

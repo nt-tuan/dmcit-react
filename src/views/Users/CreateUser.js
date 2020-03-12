@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, Label, Button, Card, CardBody, CardHeader, CardFooter, Form, Input, FormGroup } from 'reactstrap';
+import { Alert, Button, Card, CardBody, CardHeader, CardFooter, Form, Input, FormGroup } from 'reactstrap';
 
 class CreateUser extends Component {
   constructor(props) {
@@ -65,23 +65,23 @@ class CreateUser extends Component {
             CREATE_NEW_USER
         </CardHeader>
           <CardBody>
+            <Form.Field>
+              <label htmlFor="nf-username">USERNAME</label>
+              <input type="text" id="username" name="username" placeholder="ENTER_YOUR_USERNAME" value={this.state.formData.username} onChange={this.onChange}>
+              </input>
+            </Form.Field>
             <FormGroup>
-              <Label htmlFor="nf-username">USERNAME</Label>
-              <Input type="text" id="username" name="username" placeholder="ENTER_YOUR_USERNAME" value={this.state.formData.username} onChange={this.onChange}>
-              </Input>
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="email">EMAIL</Label>
+              <label htmlFor="email">EMAIL</label>
               <Input type="email" id="email" name="email" placeholder="ENTER_YOUR_EMAIL" value={this.state.formData.email} onChange={this.onChange}>
               </Input>
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="nf-password">PASSWORD</Label>
+              <label htmlFor="nf-password">PASSWORD</label>
               <Input type="password" id="password" name="password" placeholder="ENTER_YOUR_PASSWORD" value={this.state.formData.password} onChange={this.onChange}>
               </Input>
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="nf-password">CONFIRM_PASSWORD</Label>
+              <label htmlFor="nf-password">CONFIRM_PASSWORD</label>
               <Input type="password" id="confirmPassword" name="confirmPassword" placeholder="ENTER_YOUR_CONFIRM_PASSWORD" value={this.state.formData.confirmPassword} onChange={this.onChange}>
               </Input>
             </FormGroup>

@@ -33,8 +33,6 @@ class Selection extends Component {
     this.selected = null;
   }
 
-  
-
   handleOpen(value) {
     this.loadData();
   }
@@ -135,7 +133,8 @@ class Selection extends Component {
   }
 
   componentWillReceiveProps(props) {
-    this.loadCurrentValue(props.value);
+    if(props.value != this.state.value)
+      this.loadCurrentValue(props.value);
   }
 
   render() {

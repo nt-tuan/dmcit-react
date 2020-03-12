@@ -1,6 +1,6 @@
 import React from 'react';
 import { Segment, List } from 'semantic-ui-react';
-import { workflowService } from '../../_services';
+import { workflowServices } from './services';
 import { LayoutContext } from '../../containers/DefaultLayout/LayoutContext'
 
 export default function WorkflowSetting() {
@@ -8,7 +8,7 @@ export default function WorkflowSetting() {
     const layout = React.useContext(LayoutContext);
     React.useEffect(() => {
         layout.showLoading();
-        workflowService.getSetting()
+        workflowServices.getSetting()
             .then(json => setJValue(json))
             .then(layout.showClear())
             .catch(layout.showError);

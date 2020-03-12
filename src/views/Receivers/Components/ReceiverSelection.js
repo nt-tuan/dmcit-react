@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Dropdown, Form, Label } from 'semantic-ui-react';
+import React, { useState, useEffect } from 'react';
+import { Form, Select, Tag } from 'antd';
 import { RecipientServiceApi } from '../../../_services';
-import { Message } from '../../Base';
 
 export default function ReceiverSelection(props) {
   const [options, setOptions] = useState([]);
   const [rawValue, setRawValue] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const searchRef = React.useRef();
-  function handleChange(e, { value, name }) {
+  function handleChange(value) {
     if (props.onRawChange) {
       const selectItem = options.filter(u => u.id == value);
+      console.log(selectItem);
       if (selectItem.length == 0) return;
       if (props.multiple)
         props.onRawChange(selectItem);
@@ -19,7 +19,7 @@ export default function ReceiverSelection(props) {
     }
   }
 
-  function handleSearchChange(e, { searchQuery }) {
+  function handleSearchChange(searchQuery) {
     searchRef.current = searchQuery;
     setIsLoading(true);
     new Promise((resolve, reject) => loadOptions(resolve, reject))
@@ -33,10 +33,6 @@ export default function ReceiverSelection(props) {
         console.log(error);
         setIsLoading(false);
       });
-
-  }
-
-  function handleOpen() {
 
   }
 
@@ -114,40 +110,27 @@ export default function ReceiverSelection(props) {
     loadData(props.value);
   }, [props.value]);
 
-  const selectItems = options.map(u => {
-    const cate = u.customerId ? 'CUSTOMER' : (u.employeeId ? 'EMPLOYEE' : 'OTHER');
-    const color = u.customerId ? 'green' : (u.employeeId ? 'blue' : 'yellow');
-    return {
-      text: u.displayname,
-      value: u.id,
-      content: (<div>{u.displayname}&emsp;<Label color={color} tag size="mini">{cate}</Label></div>)
-    };
-  });
+  console.log(options);
 
   return (
-    <Form.Field>
-      {props.label && <label>{props.label}</label>}
-      <Dropdown
-        name={props.name}
-        fluid={props.button ? null : true}
-        selection
-        search
-        action={props.action}
-        button={props.button}
-        icon={props.button ? 'user' : null}
-        labeled={props.button ? true : null}
-        floating={props.button ? true : null}
-        className={props.button ? 'icon' : null}
-        placeholder={props.button ? null : 'RECEIVER NAME|CODE'}
-        text={props.button ? 'ADD RECEIVER' : null}
-        multiple={props.multiple}
-        options={selectItems}
+    <Form.Item label={props.label ? props.label : 'Addressees'}>
+      <Select
+        multiple={props.multiple ? 'multiplte' : undefined}
         onChange={handleChange}
-        onSearchChange={handleSearchChange}
-        onOpen={handleOpen}
+        showSearch={true}
+        onSearch={handleSearchChange}
         loading={isLoading}
         value={rawValue}
-      />
-    </Form.Field>
+        optionLabelProp='label'
+      >
+      {options.map(u => {
+        const cate = u.customerId ? 'CUSTOMER' : (u.employeeId ? 'EMPLOYEE' : 'OTHER');
+        const color = u.customerId ? 'green' : (u.employeeId ? 'blue' : 'yellow');
+        return <Select.Option key={u.id} label={u.displayname} value={u.id}>
+          <div>{u.displayname}&emsp;<Tag color={color}>{cate}</Tag></div>
+        </Select.Option>
+      })}
+      </Select>
+    </Form.Item>
   );
 }

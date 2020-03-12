@@ -2,6 +2,7 @@ import React, { useState, Suspense, useCallback, useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import { Icon, Button, Message, Dimmer, Loader, Segment } from 'semantic-ui-react';
+import { Layout, message } from 'antd';
 //import { positions, Provider } from "react-alert";
 import { PrivateRoute } from '../PrivateRoute'
 import { userActions, alertActions } from '../../_actions';
@@ -10,7 +11,6 @@ import { authentication as authenticationReducer } from '../../_reducers/authent
 import { alert as alertReducer } from '../../_reducers/alert.reducer';
 import { LayoutContext } from './LayoutContext';
 import {
-    AppAside,
     AppBreadcrumb,
     AppFooter,
     AppHeader,
@@ -23,7 +23,8 @@ import {
 } from '@coreui/react';
 // routes config
 import routes from '../../routes';
-const DefaultAside = React.lazy(() => import('./DefaultAside'));
+const { Header, Content, Sider } = Layout;
+const DefaultSidebar = React.lazy(() => import('./DefaultSidebar'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
@@ -44,7 +45,7 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 //    </div>
 //  )
 //}
-function AbstractLayout(props) {
+function AbstractLayout({ navigation }) {
     const [auth, authDispatch] = React.useReducer(authenticationReducer, { authorizing: true, authenticating: true });
     const [alert, alertDispatch] = React.useReducer(alertReducer, {});
     const loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
@@ -53,10 +54,10 @@ function AbstractLayout(props) {
         this.props.history.push('/login')
     }
 
-    const showError = _ => alertDispatch(alertActions.error(_));
-    const showSuccess = _ => alertDispatch(alertActions.success(_));
-    const showLoading = () => alertDispatch(alertActions.loading());
-    const showClear = () => alertDispatch(alertActions.clear());
+    const showError = _ => message.error(_, 10);
+    const showSuccess = _ => message.success(_, 10);
+    const showLoading = () => alertActions.loading()(alertDispatch);
+    const showClear = () => alertActions.clear()(alertDispatch);
 
     useEffect(() => {
         userActions.getMyRoles()(authDispatch);
@@ -66,13 +67,79 @@ function AbstractLayout(props) {
     return (
         <LayoutContext.Provider value={{ auth, authDispatch, alert, alertDispatch, showError, showSuccess, showLoading, showClear }}>
             <div className="app">
-                <AppHeader fixed>
+                <Layout theme='light'>
+                    <Suspense fallback={loading()}>
+                        <DefaultHeader />
+                    </Suspense>
+                    <Layout them='light'>
+                        <Suspense fallback={loading()}>
+                            <DefaultSidebar navigation={navigation} />
+                        </Suspense>
+                        <Layout theme='light' style={{padding: '0 24px', background: '#fff'}}>
+                        <AppBreadcrumb appRoutes={routes} />
+                            <Content className="site-layout-content">
+                                {alert && alert.loading && <Dimmer page active={alert && alert.loading}>
+                                    <Loader />
+                                </Dimmer>}
+                                {/*alert && alert.messages && <Message
+                                    error={alert.type == 'error'}
+                                    warning={alert.type == 'warning'}
+                                    info={alert.type == 'info'}
+                                    list={alert.messages}
+                                    onDismiss={() => alertDispatch(alertActions.clear())}
+                                />*/}
+                                <Suspense fallback={loading()}>
+                                    <Switch>
+                                        {routes.map((route, idx) => {
+                                            if (route.requireRoles) {
+                                                return <PrivateRoute
+                                                    key={idx}
+                                                    path={route.path}
+                                                    exact={route.exact}
+                                                    name={route.name}
+                                                    component={route.component}
+                                                    requireRoles={route.requireRoles}
+                                                />
+                                            }
+                                            return route.component ? (
+                                                <Route
+                                                    key={idx}
+                                                    path={route.path}
+                                                    exact={route.exact}
+                                                    name={route.name}
+                                                    render={(props) => {
+                                                        let newprops;
+                                                        if (route.params) {
+                                                            newprops = { ...props, ...route.params };
+                                                        } else {
+                                                            newprops = { ...props };
+                                                        }
+                                                        return <route.component {...newprops} />;
+                                                    }} />
+                                            ) : (null);
+                                        })}
+                                        <Redirect from="/" to="/dashboard" />
+                                    </Switch>
+                                </Suspense>
+                            </Content>
+                        </Layout>
+                    </Layout>
+                </Layout>
+                { /*<AppHeader fixed>
                     <Suspense fallback={loading()}>
                         <DefaultHeader />
                     </Suspense>
                 </AppHeader>
                 <div className="app-body">
-                    {props.appSidebar}
+                    <AppSidebar fixed display="lg">
+                        <AppSidebarHeader />
+                        <AppSidebarForm />
+                        <Suspense>
+                            <AppSidebarNav navConfig={props.navigation} {...props.extra} />
+                        </Suspense>
+                        <AppSidebarFooter />
+                        <AppSidebarMinimizer />
+                    </AppSidebar>
                     <main className="main">
                         <AppBreadcrumb appRoutes={routes} />
                         <Container fluid>
@@ -120,7 +187,6 @@ function AbstractLayout(props) {
                                 </Switch>
                             </Suspense>
                         </Container>
-
                     </main>
 
                 </div>
@@ -128,7 +194,7 @@ function AbstractLayout(props) {
                     <Suspense fallback={loading()}>
                         <DefaultFooter />
                     </Suspense>
-                </AppFooter>
+                </AppFooter> */}
             </div>
         </LayoutContext.Provider>
     );

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {Button, Icon, Accordion} from 'semantic-ui-react';
-import {workflowService} from '../../_services';
+import {Button, Icon, Accordion, Segment} from 'semantic-ui-react';
+import {workflowServices} from './services';
 import WorkflowItemContent from './WorkflowItemContent';
 import AceEditor from 'react-ace';
 import "ace-builds/src-noconflict/mode-json";
@@ -10,7 +10,7 @@ export default function WorkflowItemView({match}){
   const [parameters, setParameters] = useState('{}');
   const { id } = match.params;
   const handleExecute = () => {
-    workflowService.startWorkflow({id, parameters: JSON.parse(parameters)});
+    workflowServices.startWorkflow({id, parameters: JSON.parse(parameters)});
   }
 
   return <div>

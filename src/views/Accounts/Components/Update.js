@@ -1,5 +1,5 @@
 import React from 'react';
-import { Segment, Form, DropDown, Label, ButtonGroup, Button, Divider } from 'semantic-ui-react';
+import { Segment, Form, DropDown, Label, ButtonGroup, Button, Icon } from 'semantic-ui-react';
 import { default as EmployeeSelection } from '../../Employees/Components/Selection';
 import { default as Message } from '../../Base/Messages/Message';
 import { userService } from '../../../_services';
@@ -59,23 +59,24 @@ export class UpdateAccount extends React.Component {
 
   render() {
     return (
-      <Segment>
-        <ButtonGroup>
-          <Button onClick={this.handleSubmit} primary>UPDATE</Button>
-        </ButtonGroup>
-        <Divider />
+      <Segment>       
+        
         {this.state.message && <Message error message={this.state.message} messages={this.state.messages} />}
-        <Form>
+        <Form size='tiny'>
           <Form.Field>
-            <Label>USERNAME</Label>
+            <label>USERNAME</label>
             <Form.Input name="username" value={this.state.formData.username} readOnly />
           </Form.Field>
           <Form.Field>
-            <Label>EMAIL</Label>
+            <label>EMAIL</label>
             <Form.Input name="email" value={this.state.formData.email} readOnly />
           </Form.Field>
           <h4>ROLES</h4>
           <EditUserRoles userId={this.state.formData.id} onChange={this.handleChange} name='roles'  />
+          <Button icon  onClick={this.handleSubmit} size='mini' compact positive labelPosition='left'>
+            <Icon name='disk' />
+            SAVE
+            </Button>
         </Form>
       </Segment>
       

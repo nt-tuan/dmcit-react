@@ -3,3 +3,4 @@ export * from './ChangePassword';
 export * from './Detail';
 export * from './List';
 export * from './Update';
+export * from './ResetPassword';

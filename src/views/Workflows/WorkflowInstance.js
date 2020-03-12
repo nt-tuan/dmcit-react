@@ -1,79 +1,102 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { workflowService } from '../../_services'
+import { workflowServices } from './services'
 import { LayoutContext } from '../../containers/DefaultLayout/LayoutContext';
-import { List, Button, Progress, Icon, Label, Segment } from 'semantic-ui-react';
-import { history } from '../../_helpers/history';
-import { Container, Row, Col } from 'reactstrap';
-import AceEditor from 'react-ace';
-import "ace-builds/src-noconflict/mode-json";
-import "ace-builds/src-noconflict/theme-monokai";
-
-const _task = (u) => {
+import { Progress } from 'semantic-ui-react';
+import { Timeline, Button as B, Collapse, List as L, Tag } from 'antd';
+import Icon, {QuestionCircleOutlined, FieldTimeOutlined, LoadingOutlined, CheckCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
+const _task = ({ workflowId, instanceId, id, logs, progress, files, name, description, enabled, isWaitingForApproval, approval, running }) => {
     const [expanded, setExpanded] = useState(false);
-    const [active, setActive] = useState(false);
+    const [u, setU] = useState({ workflowId, instanceId, id, logs, progress, files, name, description, enabled, isWaitingForApproval, approval, running });
+
     React.useEffect(() => {
-        setActive(u.progress != null && u.progress.endTime == null);
-        setExpanded(u.progress != null && u.progress.endTime == null);
-    }, [u]);
-    const iconName = (status) => {
-        if (active)
-            return <List.Icon name='play' color='blue' />
-        if (u.progress == null)
-            return <List.Icon name='wait' color='grey' />
-        if (u.progress != null && u.progress.endTime != null)
-            return <List.Icon name='check' color='green' />
-        if (status == 'error')
-            return <List.Icon name='close' color='red' />
+        setU(v => ({ ...v, logs, files, progress, isWaitingForApproval, running }));
+        if (progress && progress.type == 1)
+            setExpanded(true);
+    }, [logs, files, progress, isWaitingForApproval, running]);
 
+    const getColor = () => {
+        if (u.progress == null || u.progress.type == 0)
+            return 'gray';
+        if (u.progress.type == 1)
+            return 'blue';
+        if (u.progress.type == 2)
+            return 'green';
+        if (u.progress.type == -1)
+            return 'red';
+        if (u.progress.type == 3)
+            return '#FFFF00';
     }
-    const renderLog = (u, index) => {
-        return <List.Item key={index}>
-            <List.Content>
-                <List.Description>{u}</List.Description>
-            </List.Content>
-        </List.Item>
 
-    };
-    return <List.Item key={u.id} selected={active}>
-        {(u.logs.length > 0 || u.files.length > 0) && <List.Content floated='right'>
-            <Button icon={active || expanded ? 'minus square outline' : 'plus square outline'} onClick={() => setExpanded(!expanded)} />
-        </List.Content>
+    const renderState = () => {
+        const {progress} = u;
+        if (u.isWaitingForApproval)
+            return <QuestionCircleOutlined style={{color: getColor()}} />
+        if (progress == null || progress.type == 0) {
+            return <FieldTimeOutlined style={{color: getColor()}}  />
         }
-        {iconName(u.status)}
-        <List.Content>
-            <List.Header as='a'>{u.name}</List.Header>
-            <List.Description>{u.description}</List.Description>
-            {u.progress && active && <div>
-                <List.Header>{u.progress.title}</List.Header>
-                <List.Description>{u.progress.description}</List.Description>
+        if (progress.type == 3)
+            return <QuestionCircleOutlined style={{color: getColor()}} />
+        if (progress.type == -1)
+            return <CloseCircleOutlined style={{color: getColor()}} />;
+        if (progress.type == 1)
+            return <LoadingOutlined style={{color: getColor()}} />;
+        if (progress.type == 2)
+            return <CheckCircleOutlined style={{color: getColor()}} />
+        return <FieldTimeOutlined style={{color: getColor()}} />
+    }
+
+    const renderProgress = () => {
+        if (u.progress && u.progress.type == 1)
+            return <div>
+                <p><strong>Progress: </strong>{u.progress.title}</p>
+                <p><i>{u.progress.description}</i></p>
                 {u.progress.percent && u.progress.percent > 0 && <Progress percent={u.progress.percent} />}
             </div>
+        return null;
+    }
+    const renderLog = (u, index) => {
+        return <L.Item>
+            {u}
+        </L.Item>
+    };
+
+    const approve = () => {
+        const { workflowId, instanceId } = u;
+        workflowServices.approveWorkflow({ workflowId, instanceId });
+    }
+
+    const disapprove = () => {
+        const { workflowId, instanceId } = u;
+        workflowServices.disapproveWorkflow({ workflowId, instanceId });
+    }
+    return <Timeline.Item dot={renderState()} color={getColor()}>
+        <div>
+            <strong>{u.name}</strong>
+            {((u.logs && u.logs.length > 0) || (u.files && u.files.length > 0)) &&
+                <B icon={expanded ? 'arrows-alt' : 'shrink'} style={{ float: 'right' }} onClick={() => setExpanded(!expanded)}></B>
             }
-            {u.logs && u.files && (active || expanded) && <div>
-                <hr />
-                {u.logs && u.logs.length > 0 && <div style={{ maxHeight: '200px', width: '100%', overflowY: 'scroll' }}>
-                    <p><b>Logs</b></p>
-                    <List divided>
-                        {u.logs.reverse().map(renderLog)}
-                    </List>
-                </div>}
-                {u.files && u.files.length > 0 && <div>
-                    <p><b>Files</b></p>
-                    <List>
-                        {u.files.map(u =>
-                            <List.Item>
-                                <List.Icon name='file' color='blue' verticalAlign='middle' />
-                                <List.Content>
-                                    <List.Header>
-                                        <a href={u.path} download={true}>{u.fileName}</a>
-                                    </List.Header>
-                                </List.Content>
-                            </List.Item>)}
-                    </List></div>}
-            </div>
-            }
-        </List.Content>
-    </List.Item >
+            {u.running && u.progress && u.progress.type == 3 && <B icon='check' onClick={approve} style={{ float: 'right' }} />}
+            {u.running && u.progress && u.progress.type == 3 && <B icon='close' onClick={disapprove} style={{ float: 'right' }} />}
+        </div>
+        <p>{u.description}</p>
+        {renderProgress()}
+        {u.logs && u.files && expanded && <Collapse bordered={false} defaultActiveKey={[]}>
+            {u.logs && u.logs.length > 0 && <Collapse.Panel header="Logs" key="1">
+                <L size='small'
+                    dataSource={u.logs}
+                    renderItem={renderLog} />
+            </Collapse.Panel>}
+            {u.files && u.files.length > 0 && <Collapse.Panel header="Files" key="2">
+                <L size='small'
+                    dataSource={u.files}
+                    renderItem={(u => <L.Item>
+                        <Icon.FileOutlined type='file' /> <a href={u.path} download={true}>{u.fileName}</a>
+                    </L.Item>)}
+                />
+            </Collapse.Panel>}
+        </Collapse>
+        }
+    </Timeline.Item >
 }
 
 export default function WorkflowInstance({ id, instance, running, summary }) {
@@ -135,12 +158,13 @@ export default function WorkflowInstance({ id, instance, running, summary }) {
                             return Promise.reject("No data retreived");
                     })
                     .catch(e => {
-                        layout.showError(e);
+                        layout.showError(e.message);
                         disconnect();
                     });
             })
             .catch(e => {
-                layout.showError(e);
+                console.log(e);
+                layout.showError(e.message);
                 disconnect();
             });
     };
@@ -153,19 +177,18 @@ export default function WorkflowInstance({ id, instance, running, summary }) {
 
     useEffect(() => {
         disconnect();
-        const hub = workflowService.buildHub(hubMethods);
+        const hub = workflowServices.buildHub(hubMethods);
         hubRef.current = hub;
         startConnection(instance);
     }, [id, instance]);
 
-    return <div>
-        <Segment inverted color={running == false ? 'grey' : 'blue'}>
-            <h6>Run #{instance} {running == false ? <Label>Done</Label> : <Label color="blue">Running</Label>}</h6>
-        </Segment>
+    return <div style={{ width: '100%' }}>
+        <h4>Run #{instance} {running == false ? <Tag color='gray'>Done</Tag> : <Tag color="blue">Running</Tag>}</h4>
         {summary != true &&
-            <List divided>
-                {tasks && tasks.map(u => <_task {...u} />)}
-            </List>
+            <Timeline>
+                {tasks && tasks.map((u, i) => <_task key={u.id} {...{ ...u, workflowId: id, instanceId: instance, running }} />
+                )}
+            </Timeline>
         }
     </div>
 }

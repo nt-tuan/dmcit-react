@@ -1,17 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { workflowService } from '../../_services'
+import { workflowServices } from './services'
 import { LayoutContext } from '../../containers/DefaultLayout/LayoutContext';
-import { List, Accordion, Button, Progress, Icon, Label } from 'semantic-ui-react';
+import { Header } from '../Base';
+import { Modal, Button, List, Row, Col } from 'antd';
+import { DesktopOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import WorkflowInstance from './WorkflowInstance';
-import {history} from '../../_helpers/history';
-import { Container, Row, Col } from 'reactstrap';
+import { history } from '../../_helpers/history';
 import AceEditor from 'react-ace';
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-monokai";
 
-export default function WorkflowItemContent({id, summary}){
+export default function WorkflowItemContent({ id, summary }) {
   const [info, setInfo] = useState({});
   const [instances, setInstances] = useState([]);
+  const [visible, setVisible] = useState(false);
   const layout = React.useContext(LayoutContext);
   const hubRef = useRef();
 
@@ -23,16 +25,17 @@ export default function WorkflowItemContent({id, summary}){
     if (instances == null || !instances.length) {
       return <p>No running instances</p>;
     }
-    return <List divided selection>
-      {instances.map(u => <List.Item key={u.instanceId}>
+    return <List dataSource={instances}
+      renderItem={(u) => <List.Item key={u.instanceId}>
         <WorkflowInstance summary={summary} instance={u.instanceId} id={u.id} running={u.running} />
-      </List.Item>)}
+      </List.Item>}>
+
     </List>
   }
 
   const hubMethods = {
     WorkflowStart: (ins) => setInstances(old =>
-      ([...old, ins])),
+      ([...old, { ...ins, running: true }])),
     WorkflowEnd: (ins) => setInstances(old =>
       old.map(u => {
         if (u.instanceId == ins.instanceId) {
@@ -57,7 +60,7 @@ export default function WorkflowItemContent({id, summary}){
         hub.invoke("WatchWorkflow", id)
           .then(_ => {
             if (_) {
-              setInstances(_.jobs);
+              setInstances(_.jobs.map(u => ({ ...u, running: true })));
               setInfo(_.workflow);
               layout.showClear();
             }
@@ -65,11 +68,13 @@ export default function WorkflowItemContent({id, summary}){
               return Promise.reject("No data retreived");
           })
           .catch(e => {
+            console.log(e);
             layout.showError(e);
             disconnect();
           });
       })
       .catch(e => {
+        console.log(e);
         layout.showError(e);
         disconnect();
       });
@@ -77,7 +82,7 @@ export default function WorkflowItemContent({id, summary}){
 
   const establishConnectinon = () => {
     disconnect();
-    const hub = workflowService.buildHub(hubMethods);
+    const hub = workflowServices.buildHub(hubMethods);
     hubRef.current = hub;
     startConnection();
   };
@@ -93,16 +98,20 @@ export default function WorkflowItemContent({id, summary}){
     return disconnect;
   }, []);
 
-  
+  const openDetail = () => {
+    history.push({ pathname: `/workflows/${id}` });
+  }
   return (<div>
-    <Accordion panels={[{
-      key: 'infomation',
-      title: 'Information',
-      content: {
-        content: renderInfo()
-      }
-    }]} />
-    <hr />
+    <Modal
+      visible={visible}
+      onCancel={() => setVisible(false)}
+    >
+      {renderInfo()}
+    </Modal>
+    <Header divided title={`#${id} ${info.name}`} extras={<>
+      <Button icon={<InfoCircleOutlined />} size="small" onClick={() => setVisible(true)}  />
+      <Button icon={<DesktopOutlined />} size="small" onClick={openDetail} />
+    </>} />
     {renderList()}
   </div>);
 }

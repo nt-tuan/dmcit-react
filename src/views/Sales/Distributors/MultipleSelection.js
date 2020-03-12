@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dropdown, Form, Label } from 'semantic-ui-react';
+import { Dropdown, Form } from 'semantic-ui-react';
 import { saleServices } from '../../../_services';
 
 export default function MultipleDistributorSelection(props) {

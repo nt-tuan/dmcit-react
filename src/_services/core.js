@@ -44,6 +44,10 @@ function revertAccountingPeriod() {
   return defaultFetch(`/api/core/revertAccountingPeriod`, null, { method: 'POST' });
 }
 
+function deleteAccountingPeriod(id){
+  return defaultFetch(`/api/core/${id}`, null, {method: 'DELETE'});
+}
+
 export const coreServices = {
   getBusiness,
   getSetting,
@@ -55,5 +59,6 @@ export const coreServices = {
   getOpeningAccountingPeriod,
   openAccountingPeriod,
   closeAccountingPeriod,
-  revertAccountingPeriod
+  revertAccountingPeriod,
+  deleteAccountingPeriod
 };

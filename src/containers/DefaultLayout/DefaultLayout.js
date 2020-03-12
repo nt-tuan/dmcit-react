@@ -12,16 +12,7 @@ import navigation from '../../_navs/defaultNav';
 
 
 function DefaultLayout(props){
-  const sidebar = <AppSidebar fixed display="lg">
-            <AppSidebarHeader />
-            <AppSidebarForm />
-            <Suspense>
-              <AppSidebarNav navConfig={navigation} {...props} />
-            </Suspense>
-            <AppSidebarFooter />
-            <AppSidebarMinimizer />
-          </AppSidebar>;
-  return <AbstractLayout appSidebar={sidebar} />;
+  return <AbstractLayout navigation={navigation} />;
 }
 
 export default DefaultLayout;

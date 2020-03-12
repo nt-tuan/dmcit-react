@@ -37,6 +37,14 @@ function exportCustomerLiabilities(data) {
   return defaultBlobFetch(prefixApi + 'ExportCustomerLiabilities', data);
 }
 
+const getLastCustomerARs = data => {
+  return df('ars', data);
+}
+
+const getCustomerPayments = data => {
+  return df('payment', data);
+}
+
 export const customerARService = {
   getReceiverLiability,
   loadCustomerPayment,

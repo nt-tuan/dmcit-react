@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, CardBody, CardFooter, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import { Button, Card, CardBody, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 import { Message, Dimmer, Loader } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { userActions } from '../../../_actions';

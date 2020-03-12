@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useReducer } from 'react';
 import { Button, Icon, ButtonGroup, Card, Loader } from 'semantic-ui-react';
+import { List, Button as B} from 'antd';
+import {PlusOutlined, BackwardOutlined, UnlockOutlined, LockOutlined, DownloadOutlined} from '@ant-design/icons';
+import {Header} from '../Base';
 import MyModal from '../Modals/MyModal';
 import { coreServices, collectingService } from '../../_services';
 import { accountingActions } from '../../_actions';
@@ -78,36 +81,15 @@ function AccountingPeriodsSetting(props) {
       setModal(null);
       accountingActions.getAccountingPeriods()(dispatch);
     }} />}
+    <Header title='ACCOUNTING PERIOD' extras={<>
+      <B icon={<PlusOutlined />} onClick={openAdd}>Add</B>
+      <B icon={<UnlockOutlined />} onClick={openAP} disabled={apState.opening || !apState.available}>Open</B>
+      <B icon={<LockOutlined />} onClick={closeAP} disabled={!apState.opening}>Close</B>
+      <B icon={<BackwardOutlined />} onClick={rollbackAP} disabled={apState.opening || !apState.closed}>Back</B>
+      <B icon={<DownloadOutlined />} onClick={downloadDiary131} disabled={!apState.opening}>Download 131</B>
+    </>} />
     <Card fluid>
       <Card.Content>
-        <Card.Header>
-          ACCOUNTING PERIOD &emsp;
-        <Button size="mini" icon compact onClick={openAdd} color="green" labelPosition="left">
-            <Icon name="plus" />
-            Add
-          </Button>
-          <Button size="mini" icon compact onClick={openAP} primary labelPosition="left" disabled={apState.opening || !apState.available}>
-            <Icon name="unlock" />
-            Open
-          </Button>
-
-          <Button size="mini" icon compact onClick={closeAP} primary labelPosition="left" disabled={!apState.opening}>
-            <Icon name="lock" />
-            Close
-          </Button>
-
-
-          <Button size="mini" icon compact onClick={rollbackAP} color="red" labelPosition="left" disabled={apState.opening || !apState.closed}>
-            <Icon name="undo" />
-            Back
-          </Button>
-
-          <Button size="mini" icon compact onClick={downloadDiary131} labelPosition="left" primary disabled={!apState.opening}>
-            <Icon name="download" />
-            Diary131
-            </Button>
-
-        </Card.Header>
         <Card.Description>
           <Card.Group itemsPerRow={1}>
             {viewAdd && <AccountingPeriodAdd key={-1} onSuccess={loadData} />}

@@ -40,7 +40,7 @@ export default function AddReceiverGroup(props) {
       <hr />
       <FormReceiverGroup validation={validation} onChange={data => setData(data)} data={data}/>
     <hr />
-      <Button onClick={addGroup} primary>ADD GROUP</Button>
+      <Button icon onClick={addGroup} primary labelPosition='left' compact size='mini'><Icon name='plus' />ADD GROUP</Button>
       <hr />
       </div>
     );

@@ -7,4 +7,3 @@ export * from './sale';
 export * from './collecting'
 export * from './core';
 export * from './templateService';
-export * from './workflows';

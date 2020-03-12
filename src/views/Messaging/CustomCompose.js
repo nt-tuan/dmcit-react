@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button, Label, Grid } from 'semantic-ui-react';
+import { Button, Label } from 'semantic-ui-react';
 import ProviderSelection from '../Receivers/Components/ProviderSelection';
 import ReceiverSelection from '../Receivers/Components/ReceiverSelection';
 import GroupSelection from '../ReceiverGroups/Components/GroupSelection';
@@ -10,6 +10,8 @@ import { MyProgress } from '../Base/Progress/Progress';
 import { MessagingServiceApi } from '../../_services/messaging';
 import { LayoutContext } from '../../containers/DefaultLayout/LayoutContext';
 import { alertActions } from '../../_actions';
+import { Col, Row, Form, Input } from 'antd';
+
 export default function CustomCompose(props) {
   const [content, setContent] = useState();
   const [providers, setProviders] = useState([]);
@@ -19,8 +21,8 @@ export default function CustomCompose(props) {
   const [process, setProcess] = useState();
   const layoutContext = React.useContext(LayoutContext);
 
-  function handleContentChange(e, { value, name }) {
-    setContent(value);
+  function handleContentChange(e) {
+    setContent(e.target.value);
   }
   function handleProvidersChange(e, { value, name }) {
     setProviders(value);
@@ -32,7 +34,6 @@ export default function CustomCompose(props) {
       setReceivers([]);
   }
   function onReceiverChange(value) {
-
     if (value == null)
       return;
     const newValue = receivers.filter(v => v.id == value.id && v.type == 'receiver');
@@ -140,35 +141,36 @@ export default function CustomCompose(props) {
   return (
     <div>
       <MyModal open={modal.open} component={modal.com} onClose={onCloseModal} header={modal.header} />
-      <Form>
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={10}>
-              <Form.TextArea label='CONTENT' onChange={handleContentChange} />
-              <ProviderSelection value={providers} multiple={true} onChange={handleProvidersChange} />
-              <GroupSelection
-                label='Nhóm người nhận'
-                name='groups'
-                search
-                onRawChange={onGroupChange}
-                multiple />
-              <ReceiverSelection
-                label='Người nhận'
-                name="receiver"
-                onRawChange={onReceiverChange} />
-            </Grid.Column>
-            <Grid.Column width={6} style={{ height: '323px' }}>
-              <ReceiverList data={receivers} onDataChange={handleDataChange} />
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-
-        <hr />
-        <Button primary onClick={handleReviewReceiver}>Preview</Button>
-        <Button color='green' disabled={lockSend} onClick={onSendMessage}>SEND MESSAGE</Button>
-      </Form>
-      <hr />
-      {process}
+      <Row>
+        <Col flex="auto">
+          <Form
+            layout="vertical"
+            size='small'
+          >
+            <ProviderSelection value={providers} multiple={true} onChange={handleProvidersChange} />
+            <GroupSelection
+              label='Nhóm người nhận'
+              name='groups'
+              search
+              onRawChange={onGroupChange}
+              multiple />
+            <ReceiverSelection
+              label='Người nhận'
+              onRawChange={onReceiverChange} />
+            <Form.Item label='Content'>
+              <Input.TextArea onChange={handleContentChange} />
+            </Form.Item>
+            <Button primary onClick={handleReviewReceiver}>Preview</Button>
+            <Button color='green' disabled={lockSend} onClick={onSendMessage}>SEND MESSAGE</Button>
+            {process}
+          </Form>
+        </Col>
+        <Col flex="300px" style={{ overflow: 'auto' }}>
+          <div style={{ position: "absolute", left: '10px', right: 0, bottom: 0, top: 0 }}>
+            <ReceiverList data={receivers} onDataChange={handleDataChange} />
+          </div>
+        </Col>
+      </Row>
     </div>
   );
 }

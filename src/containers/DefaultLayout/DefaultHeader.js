@@ -1,89 +1,64 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Badge, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, NavLink } from 'reactstrap';
+import { Layout, Menu, Dropdown, Button, message, Tooltip, Row, Col } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
-
-import { AppAsideToggler, AppHeaderDropdown, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
-
+import {LayoutContext} from './LayoutContext';
 import { userActions } from '../../_actions';
 import { connect } from 'react-redux';
 
 import { history } from '../../_helpers';
-
-import logo from '../../assets/img/brand/logo.svg'
-import sygnet from '../../assets/img/brand/logo.svg'
-
+const { Header } = Layout;
 const propTypes = {
   children: PropTypes.node,
 };
 
 const defaultProps = {};
 
-const user = localStorage.getItem('user');
+const navs = [
+  { name: 'Messaging', url: '/messaging' },
+  { name: 'Sales', url: '/sales' },
+  { name: 'Workflows', url: '/workflows' }
+]
 
-class _defaultHeader extends Component {
-  render() {
-    // eslint-disable-next-line
-    const { children, ...attributes } = this.props;
-    return (
-      <React.Fragment>
-        <AppSidebarToggler className="d-lg-none" display="md" mobile />
-        <AppNavbarBrand
-          full={{ src: logo, width: 188, height: 50, alt: 'DOMESCO Logo' }}
-          minimized={{ src: sygnet, width: 50, height: 60, alt: 'DOMESCO Logo' }}
-        />
-        <AppSidebarToggler className="d-md-down-none" display="lg" />
+const userMenuItems = [
+  { name: 'Profile', disable: true, url: '/' },
+  { name: 'Setting', disable: true, url: '/' },
+  { name: 'Logout', url: '/logout' }
+]
 
-        <Nav className="d-md-down-none" navbar>
-          <NavItem className="px-3">
-            <Link to="/" className="nav-link" >Dashboard</Link>
-          </NavItem>
-          <NavItem className="px-3">
-            <Link to="/accounts" className="nav-link">Users</Link>
-          </NavItem>
-          <NavItem className="px-3">
-            <Link to="/settings" className="nav-link">Settings</Link>
-          </NavItem>
-        </Nav>
-        <Nav className="ml-auto" navbar>
-          <NavItem className="d-md-down-none">
-            <NavLink href="#"><i className="icon-bell"></i></NavLink>
-          </NavItem>
-          <AppHeaderDropdown direction="down">
-            <DropdownToggle nav style={{ marginRight: '20px'}}>
-              {this.props.user && this.props.user.username}
-            </DropdownToggle>
-            <DropdownMenu right style={{ right: '0'}}>
-              <DropdownItem header tag="div" className="text-center"><strong>Account</strong></DropdownItem>
-              <DropdownItem><i className="fa fa-user"></i> Profile</DropdownItem>
-              <DropdownItem><i className="fa fa-wrench"></i> Settings</DropdownItem>
-              <DropdownItem onClick={e => {
-                this.props.history.push('/login');
-              }}><i className="fa fa-lock"></i> Logout</DropdownItem>
-            </DropdownMenu>
-          </AppHeaderDropdown>
-        </Nav>
-        {/*<AppAsideToggler className="d-lg-none" mobile />*/}
-      </React.Fragment>
-    );
-  }
+const DefaultHeader = props => {
+  // eslint-disable-next-line
+  const layout = React.useContext(LayoutContext);
+  const { children, ...attributes } = props;
+  return (
+    <Header>
+      <Row>
+        <Col flex='100px'>
+          <div className="logo" />
+        </Col>
+        <Col flex='auto'>
+          {navs.map(u => <Button key={u.url} type="link" onClick={() => history.push({ pathname: u.url })}>
+            <strong>{u.name}</strong>
+          </Button>)}
+        </Col>
+        <Col flex='200px'>
+          <div style={{float: 'right'}}>
+          {layout.auth && layout.auth.user ?
+            <Dropdown.Button overlay={<Menu>
+              {userMenuItems.map(u => <Menu.Item key={u.name}>{u.name}</Menu.Item>)}
+            </Menu>} icon={<UserOutlined />}>
+              {layout.auth.user.username}
+            </Dropdown.Button> : <Button onClick={u => history.push({ pathname: '/login' })}>
+              Login
+              </Button>
+          }
+          </div>
+        </Col>
+      </Row>
+    </Header>
+  );
 }
 
-_defaultHeader.propTypes = propTypes;
-_defaultHeader.defaultProps = defaultProps;
-
-
-function mapState(state) {
-  const { authentication } = state;
-  const { user } = authentication;
-  return { user };
-}
-
-const actionCreators = {
-  logout: userActions.logout,
-  login: userActions.login
-};
-
-const DefaultHeader = connect(mapState, actionCreators)(withRouter(_defaultHeader));
 
 export default DefaultHeader;

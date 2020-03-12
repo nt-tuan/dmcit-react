@@ -1,6 +1,6 @@
 import React from 'react';
 import Moment from 'react-moment';
-import { fixedRequestOptions, defaultFetchChain, defaultFetch, handleResponse, handleError } from '../_helpers/api-header';
+import { fixedRequestOptions, defaultFetchChain, defaultFetch, handleResponse, handleError } from '../../_helpers/api-header';
 const signalR = require('@aspnet/signalr');
 
 const prefix = "/api/workflows";
@@ -26,7 +26,7 @@ const editWorkflow = (id, data) => {
 }
 
 const deleteWorkflow = (id) => {
-  return df('', null, { method: 'DELETE' });
+  return df('/'+id, null, { method: 'DELETE' });
 }
 
 const startWorkflow = (data) => {
@@ -35,6 +35,10 @@ const startWorkflow = (data) => {
 
 const getSetting = () => {
   return df('/setting', null, {method: 'GET'});
+}
+
+const getWorkflowTasks = () => {
+  return df('/tasks', null, {method: 'GET'});
 }
 
 const buildHub = (hubMethods) => {
@@ -64,7 +68,19 @@ const getHistoryWorkflowEntry = (id) => {
   return df(`/history/${id}`, null, {method: 'GET'});
 }
 
-export const workflowService = {
+const getExecutors = () => {
+  return df(`/executors`, null, {method: 'GET'});
+}
+
+const approveWorkflow = (data) => {
+  return df(`/approve`, data, {method: 'POST'});
+}
+
+const disapproveWorkflow = (data) => {
+  return df(`/disapprove`, data, {method: 'POST'});
+}
+
+export const workflowServices = {
   getWorkflows,
   getWorkflow,
   getWorkflowStatus,
@@ -75,5 +91,9 @@ export const workflowService = {
   buildHub,
   getSetting,
   getHistoryWorkflowEntrys,
-  getHistoryWorkflowEntry
+  getHistoryWorkflowEntry,
+  getWorkflowTasks,
+  getExecutors,
+  approveWorkflow,
+  disapproveWorkflow
 };

@@ -91,7 +91,7 @@ export default function Receivers(props) {
     <Button size="mini" compact onClick={openAddCustomer} primary>ADD_CUSTOMER</Button>
     <Button size="mini" compact onClick={openEditReceiver} primary>UPDATE</Button>
     {' '}
-    <Button size="mini" compact onClick={handleImport} primary>IMPORT_TO_EXCEL</Button>
+    <Button size="mini" compact onClick={handleImport} primary>IMPORT_FROM_EXCEL</Button>
     <Button size="mini" compact disabled onClick={handleExport} primary>EXPORT_TO_EXCEL</Button>
     {' '}
     <Button size="mini" compact color='red' onClick={handleDelete}>DELETE</Button>

@@ -18,25 +18,22 @@ function login(username, password, onSuccess) {
     dispatch(request({ username }));
     userService.login(username, password)
       .then(
-        json => {
-          if (json.data) {
-            const user = json.data;
-            localStorage.setItem('user', JSON.stringify(user));
-            dispatch(success(user));
-            if (onSuccess)
-              onSuccess();
-            else
-              history.push('/');
-          } else {
-            dispatch(failure(json));
-            dispatch(alertActions.error(json));
-          }
-        },
-        error => {
-          dispatch(failure(error));
-          dispatch(alertActions.error(error));
-        }
-      );
+        user => {
+          localStorage.setItem('user', JSON.stringify(user));
+          dispatch(success(user));
+        })
+      .then(userService.getMyRoles)
+      .then(roles => dispatch({ type: userConstants.GET_MY_ROLES_SUCCESS, roles }))
+      .then(() => {
+        if (onSuccess)
+          onSuccess();
+        else
+          history.push('/');
+      })
+      .catch(error => {
+        dispatch(failure(error));
+        dispatch(alertActions.error(error));
+      });
   };
 
   function request(user) { return { type: userConstants.LOGIN_REQUEST, user } }
@@ -49,11 +46,7 @@ function getMyRoles() {
     dispatch(request());
     userService.getMyRoles()
       .then(json => {
-        if (json && json.data) {
-          dispatch(success(json.data));
-        } else {
-          return Promise.reject('NO DATA FOUND');
-        }
+        dispatch(success(json));
       })
       .catch(err => {
         dispatch(failure(err));
@@ -78,17 +71,17 @@ function isAuthenticated() {
     dispatch({ type: userConstants.AUTHENTICATE_REQUEST });
     userService.authenticated()
       .then(json => {
-        if (json && json.data) {
+        if (json) {
           dispatch({
             type: userConstants.AUTHENTICATED
           });
         } else {
           return Promise.reject();
         }
-      }).
-      catch(error => {
+      })
+      .catch(error => {
         localStorage.setItem('user', null);
-        dispatch({type: userConstants.AUTHENTICATE_FAILURE, error})
+        dispatch({ type: userConstants.AUTHENTICATE_FAILURE, error })
       });
   };
 }
@@ -100,11 +93,11 @@ function logout() {
 
 function register(user) {
   return dispatch => {
-    if (user.password != user.confirmPassword) {
+    if (user.password !== user.confirmPassword) {
       dispatch(failure({ messages: ['Password and confirm password are not match each other'] }));
       return;
     }
-      
+
     dispatch(request(user));
     userService.register(user)
       .then(

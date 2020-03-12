@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MaterialTable from 'material-table';
-import { List, Segment } from 'semantic-ui-react';
+import { List } from 'antd';
 import ReceiverListItem from '../../Messaging/Components/ReceiverListItem';
 import GroupListItem from '../../ReceiverGroups/Components/GroupListItem';
 export default function ReceiverList(props) {
@@ -15,21 +15,20 @@ export default function ReceiverList(props) {
     props.onDataChange(ndata);
   }
 
-  return <Segment style={{ height: '100%', overflowY: 'scroll'}}>
-    {data && data.length > 0 ? <div>
-      <h4>RECIPIENTS LIST</h4>
-      <hr />
-      <List divided>
-        {data.map(u => {
-          console.log(u);
-          if (u.type == 'receiver')
-            return <ReceiverListItem key={`recipient-${u.id}`} value={u} onDelete={onDelete} />
-          if (u.type == 'group')
-            return <GroupListItem key={`group-${u.id}`} value={u} />
-        })}
-      </List> </div> : <p>'NO RECIPIENTS'</p>
-    }
-  </Segment>;
+  return data && data.length > 0 ? <div>
+    <List
+      header="RECIPIENTS LIST"
+      dataSource={data}
+      size="small"
+      renderItem={u => {
+        if (u.type == 'receiver')
+          return <ReceiverListItem key={`recipient-${u.id}`} value={u} onDelete={onDelete} />
+        if (u.type == 'group')
+          return <GroupListItem key={`group-${u.id}`} value={u} />
+      }} />
+  </div> : <p>'NO RECIPIENTS'</p>;
+
+
 
   return <MaterialTable
     name="RECEIVER MESSAGE LIST"

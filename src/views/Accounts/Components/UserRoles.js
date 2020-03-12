@@ -10,14 +10,13 @@ export function UserRoles(props) {
   useEffect(() => {
     userService.getRoles(props.userId)
       .then(json => {
-        if (json && json.data) {
-          setRoles(json.data);
+        if (json) {
+          setRoles(json);
         } else {
           return Promise.reject('NO DATA FOUND');
         }
       })
       .catch(err => {
-        console.log(err);
         alert.error(err);
       });
   }, [props.userId]);
@@ -61,8 +60,8 @@ export function EditUserRoles(props) {
       
     var p1 = userService.getAllRoles()
       .then(json => {
-        if (json && json.data) {
-          return Promise.resolve(json.data)
+        if (json) {
+          return Promise.resolve(json)
         } else {
           return Promise.resolve([]);
         }
@@ -73,8 +72,8 @@ export function EditUserRoles(props) {
     var p2 = props.userId?userService
       .getRoles(props.userId)
       .then(json => {
-        if (json && json.data) {
-          return Promise.resolve(json.data);
+        if (json) {
+          return Promise.resolve(json);
         }
         return Promise.resolve([]);
       })

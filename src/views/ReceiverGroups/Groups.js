@@ -41,11 +41,11 @@ export default function Groups(props) {
   return (
     <div>
       <MyModal open={modal.open} component={modal.com} header={modal.header} expandable={modal.expandable} onClose={onModalClose} />
-      <ButtonGroup>
-        <Button primary onClick={onOpenAdd}>ADD</Button>
-        <Button primary onClick={onOpenEdit}>EDIT</Button>
-        <Button color="red" disabled>DELETE</Button>
-      </ButtonGroup>
+
+      <Button size='mini' basic onClick={onOpenAdd} icon='plus' />
+      <Button size='mini' basic onClick={onOpenEdit} icon='edit' />
+
+      <Button color="red" disabled icon='trash' size='mini' />
       <hr />
       <ListGroups tableRef={tableRef} selection={true} options={{ selection: true }} onSelectionChange={handleChange} />
     </div>

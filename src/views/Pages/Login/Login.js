@@ -20,7 +20,8 @@ class _login extends React.Component {
     const { username, password } = this.state;
     const from = this.props.history && this.props.history.location && this.props.history.location.state ? this.props.history.location.state.from : null;
     this.props.login(username, password, () => {
-      this.props.history.push(from ? from.pathname : null);
+      console.log(from);
+      this.props.history.push(from && from.pathname != 'login' ? from.pathname : 'dashboard');
     });
   }
 

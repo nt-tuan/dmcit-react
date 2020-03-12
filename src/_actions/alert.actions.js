@@ -8,17 +8,17 @@ export const alertActions = {
 };
 
 function success(message) {
-  return { type: alertConstants.SUCCESS, message };
+  return dispatch => dispatch({ type: alertConstants.SUCCESS, message });
 }
 
 function error(message) {
-  return { type: alertConstants.ERROR, message };
+  return dispatch => dispatch({ type: alertConstants.ERROR, message });
 }
 
 function clear() {
-  return { type: alertConstants.CLEAR };
+  return dispatch => dispatch({ type: alertConstants.CLEAR });
 }
 
 function loading() {
-  return { type: alertConstants.LOADING };
+  return dispatch => dispatch({ type: alertConstants.LOADING });
 }

@@ -67,7 +67,7 @@ export default function FormReceiverGroup(props) {
 
 
 
-  return (<Form error={validation != null && validation != undefined}>
+  return (<Form size='mini' error={validation != null && validation != undefined}>
     <Message error content={validation ? validation.error : null} />
     <label>GROUP NAME</label>
     <Form.Input fluid onChange={(e, { value }) => setGroupName(value)} value={groupName} error={validation != null && validation.name != null} />

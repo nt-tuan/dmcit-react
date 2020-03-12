@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Dropdown, Form, Label } from 'semantic-ui-react';
+import {Form, Select} from 'antd';
 import { RecipientServiceApi } from '../../../_services';
 
 export default function GroupSelection(props) {
@@ -7,7 +7,7 @@ export default function GroupSelection(props) {
   const [rawValue, setRawValue] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState();
-  function handleChange(e, { value, name }) {
+  function handleChange(value) {
     if (props.onRawChange) {
       if (Array.isArray(value)) {
         setIsLoading(true);
@@ -23,7 +23,6 @@ export default function GroupSelection(props) {
     } else {
       setRawValue(value);
     }
-
   }
 
   function handleSearchChange(e, { searchQuery }) {
@@ -95,27 +94,16 @@ export default function GroupSelection(props) {
   let dropDownValue = Array.isArray(rawValue) ? rawValue.map(u => u.id) : (rawValue ? rawValue.id : null);
 
   return (
-    <Form.Field>
-      {props.label && <label>{props.label}</label>}
-      <Dropdown
-        name={props.name}
-        button={props.button}
-        icon={props.button ? 'group' : null}
-        labeled={props.button ? true : null}
-        floating={props.button ? true : null}
-        className={props.button ? 'icon' : null}
-        selection
-        fluid={props.button ? null : true}
-        multiple={props.multiple}
-        search={props.search}
-        options={selectItems}
-        placeholder={props.button ? null : 'RECEIVER NAME|CODE'}
-        text={props.button ? 'SELECT GROUP' : null}
-        onChange={handleChange}
-        onSearchChange={handleSearchChange}
-        loading={isLoading}
+    <Form.Item label={props.label ? props.label:'Addressee groups'}>
+      <Select
+        mode={props.multiple ? 'multiple' : undefined}
         value={dropDownValue}
-      />
-    </Form.Field>
+        placeholder={props.placeholder}
+        onChange={handleChange}
+        loading={isLoading}
+        onSearch={handleSearchChange} >
+        {selectItems.map(u => <Select.Option key={u.value}>{u.text}</Select.Option>)}
+      </Select>
+    </Form.Item>
   );
 }

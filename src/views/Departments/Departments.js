@@ -158,7 +158,8 @@ class Departments extends Component {
     const tableOptions = {
       debounceInterval: 1500,
       selection: true,
-      paging: false
+      paging: false,
+      size: 'small'
     };
     return (
       <Segment>
@@ -170,13 +171,13 @@ class Departments extends Component {
           onCancel={() => { this.setState({ confirm: { ...this.state.confirm, open: false } }) }}
           onConfirm={this.handleConfirm}
         />
-        <ButtonGroup>
-          <Button onClick={this.handleAddOpen} color="green">New</Button>
-          <Button onClick={this.handleDetailsOpen} primary>Details</Button>
-          <Button onClick={this.handleUpdateOpen} primary>Edit</Button>
-          <Button primary onClick={this.handleExport}>Export</Button>
-          <Button primary onClick={() => this.props.history.push('/hr/departments/import')}>Import</Button>
-          <Button onClick={this.handleDeleteOpen} color="red">Delete</Button>
+        <ButtonGroup basic>
+          <Button onClick={this.handleAddOpen} icon='plus'/>
+          <Button onClick={this.handleDetailsOpen} icon='magnify' />
+          <Button onClick={this.handleUpdateOpen} icon='edit' />
+          <Button primary onClick={this.handleExport} icon='download' />
+          <Button primary onClick={() => this.props.history.push('/hr/departments/import')} icon='file excel' />
+          <Button onClick={this.handleDeleteOpen} color="red" icon='trash' />
         </ButtonGroup>
         <hr />
         <DepartmentList tableRef={this.tableRef}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dropdown, Form, Label } from 'semantic-ui-react';
+import { Select, Form } from 'antd';
 import { RecipientServiceApi } from '../../../_services';
 
 export default function ProviderSelection(props) {
@@ -36,18 +36,16 @@ export default function ProviderSelection(props) {
     setValue(props.value);
   }, [props.value]);
 
-  return (<Form.Field width={props.width}>
-    <label>{!props.label && 'PROVIDERS'}</label>
-    <Dropdown
+  return (<Form.Item label={props.label?props.label:'Messaging providers'}>
+    <Select
       name={props.name}
-      fluid
-      multiple={props.multiple ? props.multiple : false}
-      selection
-      options={options}
+      mode={props.multiple ? 'multiple' : undefined}
       value={value}
       placeholder={props.placeholder}
       onChange={handleChange}
       loading={isLoading}
-    />
-  </Form.Field>);
+    >
+      {options.map(u => <Select.Option key={u.value}>{u.text}</Select.Option>)}
+    </Select>
+  </Form.Item>);
 }

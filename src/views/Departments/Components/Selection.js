@@ -23,11 +23,10 @@ export function DepartmentSelection(props) {
 
   const handleSearchChange = (e, { searchQuery }) => {
     setState({ ...state, searchQuery });
-    console.log(searchQuery);
     loadData();
   };
 
-  function loadData() {
+  const loadData = () => {
     setState({
       ...state,
       isFetching: true
@@ -42,9 +41,15 @@ export function DepartmentSelection(props) {
     })
       .then(json => {
         if (json && json.data) {
-          const options = json.data.map(u => {
-            return { text: u.name, value: u.id, key: u.id };
-          });
+          const {data} = json;
+          const options = [];
+          json.data.forEach(u => {
+            const filter = options.filter(v => u.id == v.id);
+            if (filter.length > 0)
+              return;
+            
+          })
+          
           setOptions(options);
           setState({
             ...state,

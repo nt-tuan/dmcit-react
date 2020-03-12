@@ -21,15 +21,13 @@ export const PrivateRoute = ({ component: Component, requireRoles, ...rest }) =>
 
   const loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
-  const authorize = checkAuthorize();
-
   return (<Route {...rest} render={props => {
     if (state.auth.authorizing || state.auth.authenticating) {
       return loading();
     }
     if (!state.auth.user) {
       return <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
-    } else if (authorize) {
+    } else if (checkAuthorize()) {
       return <Component {...props} />
     } else {
       return <Redirect to={{ pathname: '/401', state: { from: props.location } }} />

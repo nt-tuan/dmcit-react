@@ -1,84 +1,78 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
 import MyModal from '../../Modals/MyModal';
 import { saleServices } from '../../../_services';
 import { saleActions } from '../../../_actions';
 import DistributorSelection from '../Distributors/Selection'
+import { Table } from '../../Base/Tables/Table';
 import { Accordion, Label, Icon, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux';
 import { useAlert } from 'react-alert';
 import Message from '../../Base/Messages/Message';
 
-function _customerList(props) {
-  const alert = useAlert();
-  const tableRef = useRef();
-
+function CustomerList({ onSelectionChange }) {
+  const [distributors, setDistributors] = useState([]);
   useEffect(() => {
-    tableRef.current.onQueryChange();
-  }, [props.filter])
+    saleServices.getDistributors().then(json => {
+      setDistributors(json.data);
+    }).catch();
+  }, []);
 
-  return (
-    <div>
-      {props.options && props.options.filter &&
-        <div>
-          <Form>
-            <DistributorSelection handleChange={props.onDistributorChange} />
-          </Form>
-          <hr />
-        </div>
+  const columns = [
+    {
+      title: 'CODE',
+      dataIndex: 'code'
+    },
+    {
+      title: 'NAME',
+      dataIndex: 'name'
+    },
+    {
+      title: 'DISTRIBUTOR',
+      dataIndex: 'distributor',
+      render: (text, row) => row.distributor.name,
+      filters: distributors.map(({ id, name }) => ({ value: id, text: name }))
+    },
+    {
+      title: 'CATEGORY',
+      dataIndex: 'category'
+    }
+  ];
+
+  const rowSelection = () => {
+    if (onSelectionChange)
+      return {
+        onChange: (selectedRowKeys, selectedRows) => {
+          onSelectionChange && onSelectionChange(selectedRowKeys, selectedRows);
+        }
       }
-      <MaterialTable
-        title="Danh sách khách hàng"
-        columns={saleServices.customerTableColumns()}
-        tableRef={tableRef}
-        data={(query) => new Promise((resolve, reject) => {
-          const postData = {
-            pageSize: query.pageSize,
-            page: query.page,
-            orderBy: query.orderBy ? query.orderBy.key : null,
-            orderDirection: query.orderDirection === "asc" ? 0 : 1,
-            search: query.search,
-            filter: props.filter
-          };
+    return null;
+  };
 
-          saleServices.getCustomers(postData).then(json => {
-            if (json.data) {
-              const { data, page, totalCount } = json.data;
-              resolve({
-                data, page, totalCount
-              });
-            } else {
-              return Promise.reject({ message: 'NO DATA FOUND' });
-            }
-          }).catch(error => {
-            alert.error(error);
-          });
-        })}
-        //parentChildData={(row, rows) => rows.find(a => a.code === row.parentCode)}
-        options={{
-          ...props.options,
-          debounceInterval: 2000,
-          headerStyle: {
-            zIndex: 1
-          }
-        }}
-        onSelectionChange={props.onSelectionChange}
-      />
-    </div>
+  return (<div>
+    <Table
+      rowKey={r => `${r.distributor}_${r.code}`}
+      columns={columns}
+      query={postData => saleServices.getCustomers(postData).then(json => {
+        if (json.data) {
+          const { data, page, totalCount } = json.data;
+          return {
+            data: data.map(u => {
+              if (u.person) {
+                return { ...u, name: u.person.displayname, category: 'Person' }
+              }
+              if (u.business)
+                return { ...u, name: u.business.displayname, category: 'Business' }
+              return { ...u }
+            }), current: page, total: totalCount
+          };
+        } else {
+          return Promise.reject({ message: 'NO DATA FOUND' });
+        }
+      })}
+      rowSelection={rowSelection()}
+    />
+  </div>
   );
 }
-
-const mapState = (state) => {
-  const { query, filter } = state.customers;
-  return {
-    query, filter
-  };
-}
-
-const actionCreators = {
-  onDistributorChange: saleActions.changeDistributorSelection
-}
-
-const CustomerList = connect(mapState, actionCreators)(_customerList);
-
 export default CustomerList;

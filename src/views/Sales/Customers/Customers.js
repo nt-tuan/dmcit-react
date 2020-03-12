@@ -1,27 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import CustomerList from './List';
 import CustomerDetail from './CustomerDetail';
-import Message from '../../Base/Messages/Message';
+import { Menu } from 'antd';
+import {UserAddOutlined, ImportOutlined, ExportOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons'
 import MyModal from '../../Modals/MyModal';
-import { ButtonGroup, Segment, Button } from 'semantic-ui-react';
 
 
 export default function Customers(props) {
-  const tableRef = useRef();
-  const selectionRef = useRef();
+  const [selectedRows, setSelectedRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modal, setModal] = useState({ com: null, expanable: null, header: null });
   const [showFilter, setShowFilter] = useState(false);
 
-  function handleSelectionChange(rows) {
-    selectionRef.current = rows;
+  function handleSelectionChange(keys, rows) {
+    setSelectedRows(rows);
+  }
+
+  const handleAction = ({key}) => {
+    console.log('ACCCCC', key);
+    if(key === 'add')
+      openDetail();
   }
 
   function openDetail() {
-    console.log(selectionRef.current);
-    if (selectionRef.current && selectionRef.current.length > 0) {
-      let com = <CustomerDetail id={selectionRef.current[0].id} />
-      let expanable = `/sales/customers/${selectionRef.current[0].id}`;
+    if (selectedRows.length > 0) {
+      let com = <CustomerDetail id={selectedRows[0].id} />
+      let expanable = `/sales/customers/${selectedRows[0].id}`;
       setModal({
         com,
         expanable,
@@ -31,38 +35,31 @@ export default function Customers(props) {
     }
   }
 
-  return (<Segment>
+  return (<div>
     <MyModal open={modalOpen} component={modal.com} onClose={() => setModalOpen(false)} expandable={modal.expandLink} header={modal.header} />
-    <ButtonGroup compact>
-      <Button onClick={openDetail} primary>
-        DETAIL
-      </Button>
-      <Button onClick={openDetail} primary>
-        UPDATE
-      </Button>
-      <Button onClick={openDetail} primary>
-        IMPORT
-      </Button>
-      <Button onClick={openDetail} primary>
-        EXPORT
-      </Button>
-      <Button onClick={openDetail} color='red'>
-        DELETE
-      </Button>
-    </ButtonGroup>
-    <ButtonGroup floated='right'>
-      <Button primary compact icon='filter'
-        onClick={() => {
-          setShowFilter(!showFilter);
-        }}>
-      </Button>
-    </ButtonGroup>
-    <hr />
-    <CustomerList tableRef={tableRef} onSelectionChange={handleSelectionChange} options={{
-      debounceInterval: 1000,
-      selection: true,
-      filter: showFilter
-    }} />
-  </Segment>
+    <Menu selectable={false} onClick={handleAction} mode="horizontal">
+      <Menu.Item key="add" disabled={selectedRows.length == 0}>
+        <UserAddOutlined />
+        New
+        </Menu.Item>
+      <Menu.Item key="update" disabled={selectedRows.length == 0}>
+        <EditOutlined />
+        Update
+        </Menu.Item>
+      <Menu.Item key='import'>
+        <ImportOutlined />
+        Import
+        </Menu.Item>
+      <Menu.Item key='export'>
+        <ExportOutlined />
+        Export
+        </Menu.Item>
+      <Menu.Item key='delete' disabled={selectedRows.length == 0}>
+        <DeleteOutlined />
+        Delete
+        </Menu.Item>
+    </Menu>
+    <CustomerList onSelectionChange={handleSelectionChange} />
+  </div>
   );
 }

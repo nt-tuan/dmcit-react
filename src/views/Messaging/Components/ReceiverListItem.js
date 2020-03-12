@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { List, Button, Label } from 'semantic-ui-react';
+import { List, Button } from 'antd';
+import {DeleteOutlined} from '@ant-design/icons';
 
 export default function ReceiverListItem(props) {
   const [value, setValue] = useState();
@@ -15,16 +16,16 @@ export default function ReceiverListItem(props) {
   const color = value.customerId ? 'green' : (value.employeeId ? 'blue' : 'yellow');
 
   return (
-    <List.Item>
-      <List.Content floated='right'>
-        <Button icon='close' size="mini" compact onClick={u => { props.onDelete && props.onDelete(value); }} color='red'></Button>
-      </List.Content>
-      <List.Content>
-        <List.Header>
-          {value.displayname} &emsp;
-          <Label tag color={color}>{cate}</Label>
-        </List.Header>
-      </List.Content>
+    <List.Item
+      actions={[<Button icon={<DeleteOutlined />} 
+        size="small" 
+        onClick={u => { props.onDelete && props.onDelete(value); }} 
+        color='red'></Button>]}
+    >
+      <List.Item.Meta
+        title={value.displayname}
+        description={cate}
+      />
     </List.Item>
   );
 }

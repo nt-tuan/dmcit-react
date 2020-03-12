@@ -1,19 +1,19 @@
 import React from 'react';
-import { Label, List, Button } from 'semantic-ui-react'
+import { List, Button } from 'antd';
+import {DeleteOutlined} from '@ant-design/icons';
 export default function GroupListItem(props) {
   return (
-    <List.Item>
-      <List.Content floated='right'>
-        <Button icon='close' onClick={u => {
+    <List.Item
+      actions={[
+        <Button icon={<DeleteOutlined />} onClick={u => {
           props.onDelete && props.onDelete(props.value);
-        }} color='red' />
-      </List.Content>
-      <List.Content>
-        <List.Header>
-          {props.value.name} &emsp;
-      <Label color='orange' tag>GROUP</Label>
-        </List.Header>
-      </List.Content>
+        }} size='small' />
+      ]}
+    >
+      <List.Item.Meta
+        title={props.value.name}
+        description="group"
+       />
     </List.Item>
   );
 }

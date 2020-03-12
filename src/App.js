@@ -16,8 +16,18 @@ const DefaultLayout = Loadable({
 });
 
 const WorkflowLayout = Loadable({
-  loader: () => import('./containers/DefaultLayout/WorkflowLayout'),
+  loader: () => import('./views/Workflows/Layout'),
   loading
+});
+
+const SalesLayout = Loadable({
+  loader: () => import('./views/Sales/Layout'),
+  loading
+});
+
+const MessagingLayout = Loadable({
+loader: () => import('./views/Messaging/Layout'),
+loading
 });
 
 // Pages
@@ -71,6 +81,8 @@ class _app extends Component {
           <Route exact path="/404" name="Page 404" component={Page404} />
           <Route exact path="/500" name="Page 500" component={Page500} />
           <Route path='/workflows' name='Workflows' component={WorkflowLayout} />
+          <Route path='/sales' name='Workflows' component={SalesLayout} />
+          <Route path='/messaging' name='Messaging' component={MessagingLayout} />
           <Route path="/" name="Home" component={DefaultLayout} />
         </Switch>
       </HashRouter>
